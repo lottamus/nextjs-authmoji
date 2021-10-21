@@ -24,7 +24,7 @@ export default async function callback(req, res) {
 
   if (verifiedSequence?.status === "COMPLETED") {
     // Update user or do some action
-    const user = verifyPhoneNumber({
+    const user = await verifyPhoneNumber({
       verifyId: verifiedSequence.sequence_id,
       phoneNumber: verifiedSequence.tel,
     });
