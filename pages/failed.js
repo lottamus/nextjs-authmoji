@@ -10,7 +10,7 @@ export default function Home() {
           alt="Workflow"
         />
         <h2 className="mt-6 text-3xl font-extrabold text-center text-gray-900">
-          Success!
+          Failed!
         </h2>
       </div>
     </div>

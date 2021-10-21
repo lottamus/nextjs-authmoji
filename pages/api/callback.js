@@ -6,33 +6,32 @@ export default async function callback(req, res) {
     return res.status(405).send({ message: "Method not allowed" });
   }
 
+  let verifiedSequence;
+
   try {
-    console.log("Verifying Authmoji token");
+    console.log("Verifying Authmoji code");
     // Verify the JWT to make sure it's coming from Authmoji
-    const {
-      approved,
-      verifyId,
-      tel: phoneNumber,
-    } = jwt.verify(req.query.code, process.env.AUTHMOJI_SECRET, {
+    verifiedSequence = jwt.verify(req.query.code, process.env.AUTHMOJI_SECRET, {
       issuer: process.env.AUTHMOJI_URL,
       audience: process.env.AUTHMOJI_ID,
     });
 
-    console.log("Verifying Authmoji token", {
-      approved,
-      verifyId,
-      phoneNumber,
-    });
-
-    if (approved) {
-      // Update user or do some action
-      const user = verifyPhoneNumber({ verifyId, phoneNumber });
-      console.log("User is verified", user);
-    }
+    console.log("Verified Authmoji code", verifiedSequence);
   } catch (error) {
     // Handle error
     console.error(error);
   }
 
-  res.redirect(302, "/success");
+  if (verifiedSequence?.status === "COMPLETED") {
+    // Update user or do some action
+    const user = verifyPhoneNumber({
+      verifyId: verifiedSequence.sequence_id,
+      phoneNumber: verifiedSequence.tel,
+    });
+    console.log("User is verified", user);
+
+    res.redirect(302, "/success");
+  } else {
+    res.redirect(302, "/failed");
+  }
 }
